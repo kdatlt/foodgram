@@ -1,3 +1,67 @@
+from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 
-# Create your models here.
+from users.models import User
+
+
+class Ingredient(models.Model):
+    """Модель ингредиента."""
+    name = models.CharField(
+        max_length=150, blank=False, verbose_name='Название')
+    unit_of_measure = models.CharField(
+        max_length=50, blank=False, verbose_name='Единица измерения')
+
+    class Meta:
+        verbose_name = 'ингредиент'
+        verbose_name_plural = 'Ингредиенты'
+
+    def __str__(self):
+        return f'{self.name}, {self.unit_of_measure}'
+
+
+class Tag(models.Model):
+    """Модель тега."""
+    name = models.CharField(
+        max_length=50, unique=True, blank=False, verbose_name='Название')
+    slug = models.SlugField(
+        max_length=50, unique=True, blank=False,
+        validators=(RegexValidator(r'^[-a-zA-Z0-9_]+$')))
+
+    class Meta:
+        verbose_name = 'тег'
+        verbose_name_plural = 'Теги'
+
+    def __str__(self):
+        return self.name
+
+
+class Recipe(models.Model):
+    """Модель рецепта."""
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='recipes',
+        verbose_name='Автор рецепта')
+    name = models.CharField(
+        max_length=150, blank=False, verbose_name='Название')
+    image = models.ImageField(
+        blank=False, upload_to='images/recipes/', verbose_name='Фото')
+    text = models.TextField(blank=False, verbose_name='Описание')
+    ingredients = models.ManyToManyField(
+        Ingredient, through='IngredientRecipe', blank=False,
+        verbose_name='Ингредиенты')
+    tags = models.ManyToManyField(
+        Tag, through='TagRecipe', blank=False, verbose_name='Теги')
+    cooking_time = models.PositiveSmallIntegerField(
+        blank=False, validators=(MinValueValidator(1),),
+        verbose_name='Время приготовления, мин')
+    short_link = models.CharField(
+        max_length=7, unique=True, blank=True, verbose_name='Короткая ссылка')
+    pub_date = models.DateTimeField(
+        auto_now_add=True, verbose_name='Дата публикации')
+
+    class Meta:
+        ordering = ('-pub_date',)
+        verbose_name = 'рецепт'
+        verbose_name_plural = 'Рецепты'
+
+    def __str__(self):
+        return self.name
