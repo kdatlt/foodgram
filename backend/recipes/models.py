@@ -39,22 +39,22 @@ class Tag(models.Model):
 
 class Recipe(models.Model):
     """Модель рецепта."""
-    author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='recipes',
-        verbose_name='Автор')
-    name = models.CharField(
-        max_length=150, blank=False, verbose_name='Название')
-    description = models.TextField(blank=False, verbose_name='Описание')
-    image = models.ImageField(
-        blank=False, upload_to='images/recipes/', verbose_name='Фото')
     ingredients = models.ManyToManyField(
         Ingredient, through='IngredientRecipe', blank=False,
         verbose_name='Ингредиенты')
     tags = models.ManyToManyField(
         Tag, through='TagRecipe', blank=False, verbose_name='Тег')
+    image = models.ImageField(
+        blank=False, upload_to='images/recipes/', verbose_name='Фото')
+    name = models.CharField(
+        max_length=256, blank=False, verbose_name='Название')
+    text = models.TextField(blank=False, verbose_name='Описание')
     cooking_time = models.PositiveSmallIntegerField(
         blank=False, validators=[MinValueValidator(1)],
         verbose_name='Время приготовления, мин')
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='recipes',
+        verbose_name='Автор')
     short_link = models.CharField(
         max_length=7, unique=True, blank=True, verbose_name='Короткая ссылка')
     pub_date = models.DateTimeField(

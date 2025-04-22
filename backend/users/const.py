@@ -1,2 +1,0 @@
-MAX_BIO_LENGHT: int = 512
-MAX_ROLE_LENGTH: int = 50
