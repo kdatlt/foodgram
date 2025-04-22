@@ -5,14 +5,16 @@ from django.http import HttpResponse
 from djoser.views import UserViewSet
 
 from recipes.models import Ingredient, Tag, User, Recipe
+from .serializers import TagSerializer
+from .pagination import CustomPagination
 
 
 class CustomUserViewSet(UserViewSet):
     """Вьюсет для модели User."""
     queryset = User.objects.all()
     # serializer_class = CustomUserSerializer
-    # permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-    # pagination_class = CustomPagination
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    pagination_class = CustomPagination
 
 
 """
@@ -117,8 +119,9 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     """Вьюсет для модели Tag."""
     queryset = Tag.objects.all()
-    # serializer_class = TagSerializer
+    serializer_class = TagSerializer
     # permission_classes = (permissions.AllowAny,)
+
 
 class RecipeViewSet(viewsets.ModelViewSet):
     """Вьюсет для модели Recipe."""
