@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from rest_framework import filters, permissions, status, viewsets
+from rest_framework.views import APIView
 
 from recipes.models import Ingredient, Tag, User
 
