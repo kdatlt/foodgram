@@ -9,7 +9,7 @@ User = get_user_model()
 class Ingredient(models.Model):
     """Модель ингредиента."""
     name = models.CharField(
-        max_length=150, blank=False, verbose_name='Название')
+        max_length=150, blank=False, db_index=True, verbose_name='Название')
     unit_of_measure = models.CharField(
         max_length=50, blank=False, verbose_name='Единица измерения')
 
@@ -102,8 +102,8 @@ class TagRecipe(models.Model):
         Recipe, on_delete=models.CASCADE, verbose_name='Рецепт')
 
     class Meta:
-        verbose_name = 'теги в рецепте'
-        verbose_name_plural = 'Теги в рецептах'
+        verbose_name = 'тег рецепта'
+        verbose_name_plural = 'Теги рецепта'
         constraints = [
             models.UniqueConstraint(
                 fields=['tag', 'recipe'],
@@ -113,3 +113,30 @@ class TagRecipe(models.Model):
 
     def __str__(self):
         return f'Рецепт: {self.recipe} с тегом: {self.tag}'
+
+
+class Follow(models.Model):
+    """ Модель для создания подписок на автора"""
+
+    author = models.ForeignKey(
+        User, related_name='follow', on_delete=models.CASCADE,
+        verbose_name='Автор')
+    user = models.ForeignKey(
+        User, related_name='follower', on_delete=models.CASCADE,
+        verbose_name='Подписчик')
+
+    class Meta:
+        """Мета-параметры модели"""
+
+        verbose_name = 'подписка'
+        verbose_name_plural = 'Подписки'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'author'], name='unique_follow'
+            )
+        ]
+
+    def __str__(self):
+        """Метод строкового представления модели."""
+
+        return f'{self.user} {self.author}'

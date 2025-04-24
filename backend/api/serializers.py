@@ -4,7 +4,7 @@ from djoser.serializers import UserSerializer, UserCreateSerializer
 from django.core.files.base import ContentFile
 import base64
 
-from recipes.models import Ingredient, Recipe, Tag
+from recipes.models import Ingredient, Recipe, Tag, Follow
 
 
 User = get_user_model()
@@ -21,8 +21,8 @@ class Base64ImageField(serializers.Field):
             try:
                 # Декодируем строку base64 в байты
                 decoded_file = base64.b64decode(data)
-            except (TypeError, ValueError, UnicodeDecodeError) as e:
-                raise serializers.ValidationError("Некорректные данные base64")
+            except (TypeError, ValueError, UnicodeDecodeError):
+                raise serializers.ValidationError('Некорректные данные base64')
 
             # Создаём объект файла из декодированных данных
             file_object = ContentFile(decoded_file, name='uploaded_image.jpg')
@@ -30,7 +30,7 @@ class Base64ImageField(serializers.Field):
             return file_object
         else:
             raise serializers.ValidationError(
-                "Данные должны быть строкой base64")
+                'Данные должны быть строкой base64')
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -74,3 +74,24 @@ class CustomUserCreateSerializer(UserCreateSerializer):
                 'с адресом электронной почты!'
             )
         return data
+
+
+class CustomUserSerializer(UserCreateSerializer):
+    """Сериализатор для модели User."""
+
+    is_subscribed = serializers.SerializerMethodField()
+
+    class Meta:
+        """Мета-параметры сериализатора"""
+
+        model = User
+        fields = ('email', 'id', 'username', 'first_name', 'last_name',
+                  'is_subscribed')
+
+    def get_is_subscribed(self, obj):
+        """Метод проверки подписки"""
+
+        user = self.context.get('request').user
+        if not user.is_authenticated:
+            return False
+        return Follow.objects.filter(user=user, author=obj.id).exists()
