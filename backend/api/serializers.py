@@ -4,7 +4,7 @@ from djoser.serializers import UserSerializer, UserCreateSerializer
 from django.core.files.base import ContentFile
 import base64
 
-from recipes.models import Ingredient, Recipe, Tag, Follow
+from recipes.models import Ingredient, Recipe, Tag, Follow, TagRecipe, IngredientRecipe
 
 
 User = get_user_model()
@@ -50,7 +50,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    """Сериализатор для модели Ingredient."""
+    """Сериализатор для модели Recipe."""
     image = Base64ImageField()
 
     class Meta:
@@ -95,3 +95,19 @@ class CustomUserSerializer(UserCreateSerializer):
         if not user.is_authenticated:
             return False
         return Follow.objects.filter(user=user, author=obj.id).exists()
+
+
+class IngredientRecipeSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели IngredientRecipe."""
+
+    class Meta:
+        model = IngredientRecipe
+        fields = '__all__'
+
+
+class TagRecipeSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели TagRecipe."""
+
+    class Meta:
+        model = TagRecipe
+        fields = '__all__'
