@@ -111,3 +111,13 @@ class TagRecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = TagRecipe
         fields = '__all__'
+
+
+class FavoritesSerializer(serializers.ModelSerializer):
+    """Сериализатор для добавления в избранное по модели Recipe."""
+
+    class Meta:
+        """Мета-параметры сериализатора"""
+
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time')

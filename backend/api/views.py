@@ -4,8 +4,8 @@ from rest_framework.views import APIView
 from django.http import HttpResponse
 from djoser.views import UserViewSet
 
-from recipes.models import Ingredient, Tag, User, Recipe
-from .serializers import TagSerializer, IngredientSerializer, CustomUserSerializer
+from recipes.models import Ingredient, Tag, User, Recipe, Favorite
+from .serializers import TagSerializer, IngredientSerializer, CustomUserSerializer, FavoritesSerializer
 from .pagination import CustomPagination
 
 
@@ -235,3 +235,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
             shopping_cart += f'{name} ({measurement_unit}) - {amount}\n'
         return HttpResponse(shopping_cart, content_type='text/plain')
         """
+
+
+class FavoriteViewSet(viewsets.ModelViewSet):
+    """Вьюсет для модели Favorite."""
+    queryset = Favorite.objects.all()
+    serializer_class = FavoritesSerializer
+    # permission_classes = (permissions.AllowAny,)
