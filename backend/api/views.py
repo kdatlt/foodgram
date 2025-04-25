@@ -1,12 +1,16 @@
+from django.http import HttpResponse
 from django.shortcuts import render
+from djoser.views import UserViewSet
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.views import APIView
-from django.http import HttpResponse
-from djoser.views import UserViewSet
 
-from recipes.models import Ingredient, Tag, User, Recipe, Favorite
-from .serializers import TagSerializer, IngredientSerializer, CustomUserSerializer, FavoritesSerializer
+from recipes.models import Favorite, Ingredient, Recipe, Tag, User
+
+from .permissions import IsAuthorOrReadOnly
 from .pagination import CustomPagination
+from .serializers import (CustomUserSerializer, FavoritesSerializer,
+                          IngredientSerializer, RecipeCreateSerializer,
+                          TagSerializer)
 
 
 class CustomUserViewSet(UserViewSet):
@@ -126,16 +130,14 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     """Вьюсет для модели Recipe."""
     queryset = Recipe.objects.all()
-    """
+
     serializer_class = RecipeCreateSerializer
     permission_classes = (
-        permissions.IsAuthenticatedOrReadOnly,
-        IsAuthorOrReadOnly,
-    )
-    filter_backends = (DjangoFilterBackend,)
-    filterset_class = RecipeFilter
+        permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly)
+    # filter_backends = (DjangoFilterBackend,)
+    # filterset_class = RecipeFilter
     pagination_class = CustomPagination
-
+    """
     def perform_create(self, serializer):
         serializer.save(
             author=self.request.user,

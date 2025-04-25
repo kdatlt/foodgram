@@ -1,11 +1,12 @@
-from rest_framework import serializers
-from django.contrib.auth import get_user_model
-from djoser.serializers import UserSerializer, UserCreateSerializer
-from django.core.files.base import ContentFile
 import base64
 
-from recipes.models import Ingredient, Recipe, Tag, Follow, TagRecipe, IngredientRecipe
+from django.contrib.auth import get_user_model
+from django.core.files.base import ContentFile
+from djoser.serializers import UserCreateSerializer, UserSerializer
+from rest_framework import serializers
 
+from recipes.models import (Follow, Ingredient, IngredientRecipe, Recipe, Tag,
+                            TagRecipe, IngredientRecipe)
 
 User = get_user_model()
 
@@ -121,3 +122,42 @@ class FavoritesSerializer(serializers.ModelSerializer):
 
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
+
+
+class IngredientCreatesRecipeSerializer(serializers.ModelSerializer):
+    """Сериализатор для ингредиентов в рецептах"""
+
+    id = serializers.IntegerField()
+    amount = serializers.IntegerField()
+
+    @staticmethod
+    def validate_amount(value):
+        """Метод валидации количества"""
+
+        if value < 1:
+            raise serializers.ValidationError(
+                'Количество ингредиента должно быть больше 0!'
+            )
+        return value
+
+    class Meta:
+        """Мета-параметры сериализатора"""
+
+        model = IngredientRecipe
+        fields = ('id', 'amount')
+
+
+class RecipeCreateSerializer(serializers.ModelSerializer):
+    """Сериализатор для создания рецептов"""
+
+    ingredients = IngredientCreatesRecipeSerializer(many=True)
+    tags = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Tag.objects.all())
+    image = Base64ImageField()
+
+    class Meta:
+        """Мета-параметры сериализатора"""
+
+        model = Recipe
+        fields = ('ingredients', 'tags', 'name',
+                  'image', 'text', 'cooking_time')

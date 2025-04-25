@@ -1,7 +1,6 @@
+from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
-from django.contrib.auth import get_user_model
-
 
 User = get_user_model()
 
@@ -140,7 +139,8 @@ class Follow(models.Model):
         """Метод строкового представления модели."""
 
         return f'{self.user} {self.author}'
-    
+
+
 class Favorite(models.Model):
     """Модель избранного."""
     user = models.ForeignKey(
