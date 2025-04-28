@@ -3,6 +3,8 @@ from django.shortcuts import render
 from djoser.views import UserViewSet
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.views import APIView
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from recipes.models import Favorite, Ingredient, Recipe, Tag, User
 
@@ -18,7 +20,18 @@ class CustomUserViewSet(UserViewSet):
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    # permission_classes = (permissions.AllowAny,)
     pagination_class = CustomPagination
+
+    @action(
+        detail=False,
+        methods=['get', ],
+        permission_classes=(permissions.IsAuthenticated,)
+    )
+    def me(self, request):
+        """Получение информации о текущем пользователе."""
+        serializer = self.get_serializer(request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 """
