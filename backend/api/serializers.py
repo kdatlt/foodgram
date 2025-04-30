@@ -135,7 +135,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 
 class FavoritesSerializer(serializers.ModelSerializer):
-    """Сериализатор для добавления в избранное по модели Recipe."""
+    """Сериализатор для добавления рецепта в избранное."""
 
     class Meta:
         """Мета-параметры сериализатора"""
