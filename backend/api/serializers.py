@@ -50,15 +50,6 @@ class IngredientSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'measurement_unit')
 
 
-class RecipeSerializer(serializers.ModelSerializer):
-    """Сериализатор для модели Recipe."""
-    image = Base64ImageField()
-
-    class Meta:
-        model = Recipe
-        fields = '__all__'
-
-
 class CustomUserCreateSerializer(UserCreateSerializer):
     """Сериализатор для создания пользователя."""
 
@@ -101,17 +92,46 @@ class CustomUserSerializer(UserCreateSerializer):
 class IngredientRecipeSerializer(serializers.ModelSerializer):
     """Сериализатор для модели IngredientRecipe."""
 
+    ingredient = IngredientSerializer(read_only=True)
+
     class Meta:
         model = IngredientRecipe
-        fields = '__all__'
+        fields = ('ingredient', 'amount')
 
 
 class TagRecipeSerializer(serializers.ModelSerializer):
     """Сериализатор для модели TagRecipe."""
 
+    tag = TagSerializer(read_only=True)
+
     class Meta:
         model = TagRecipe
-        fields = '__all__'
+        fields = ('tag',)
+
+
+class RecipeSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели Recipe."""
+
+    ingredients = IngredientRecipeSerializer(
+        source='ingredients_in_recipe', many=True)
+    tags = TagRecipeSerializer(many=True)
+    image = Base64ImageField()
+
+    class Meta:
+        model = Recipe
+        fields = (
+            'id', 'name', 'text', 'cooking_time',
+            'image', 'ingredients', 'tags')
+
+    def create(self, validated_data):
+        ingredients_data = validated_data.pop('ingredients_in_recipe')
+        tags_data = validated_data.pop('tags')
+        recipe = Recipe.objects.create(**validated_data)
+        for ingredient_data in ingredients_data:
+            IngredientRecipe.objects.create(recipe=recipe, **ingredient_data)
+        for tag_data in tags_data:
+            TagRecipe.objects.create(recipe=recipe, **tag_data)
+        return recipe
 
 
 class FavoritesSerializer(serializers.ModelSerializer):
@@ -154,6 +174,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     tags = serializers.PrimaryKeyRelatedField(
         many=True, queryset=Tag.objects.all())
     image = Base64ImageField()
+    author = serializers.ReadOnlyField(source='author.username')
 
     class Meta:
         """Мета-параметры сериализатора"""

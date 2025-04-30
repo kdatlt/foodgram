@@ -11,7 +11,7 @@ from recipes.models import Favorite, Ingredient, Recipe, Tag, User
 from .permissions import IsAuthorOrReadOnly
 from .pagination import CustomPagination
 from .serializers import (CustomUserSerializer, FavoritesSerializer,
-                          IngredientSerializer, RecipeCreateSerializer,
+                          IngredientSerializer, RecipeSerializer,
                           TagSerializer)
 
 
@@ -20,13 +20,13 @@ class CustomUserViewSet(UserViewSet):
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-    # permission_classes = (permissions.AllowAny,)
     pagination_class = CustomPagination
 
     @action(
         detail=False,
-        methods=['get', ],
-        permission_classes=(permissions.IsAuthenticated,)
+        methods=['get'],
+        permission_classes=(permissions.IsAuthenticated,),
+        url_path='me'
     )
     def me(self, request):
         """Получение информации о текущем пользователе."""
@@ -144,7 +144,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     """Вьюсет для модели Recipe."""
     queryset = Recipe.objects.all()
 
-    serializer_class = RecipeCreateSerializer
+    serializer_class = RecipeSerializer
     permission_classes = (
         permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly)
     # filter_backends = (DjangoFilterBackend,)
