@@ -2,7 +2,7 @@ from django.contrib.admin import ModelAdmin, register
 
 from .models import (
     Ingredient, Tag, IngredientRecipe, TagRecipe, Recipe,
-    Follow, Favorite)
+    Follow, Favorite, ShoppingCart)
 
 
 @register(Ingredient)
@@ -40,11 +40,11 @@ class TagAdmin(ModelAdmin):
 class IngredientInRecipe(ModelAdmin):
     list_display = ('pk', 'recipe', 'ingredient', 'amount')
 
-"""
+
 @register(ShoppingCart)
 class ShoppingCartAdmin(ModelAdmin):
     list_display = ('pk', 'user', 'recipe')
-"""
+
 
 @register(Follow)
 class FollowAdmin(ModelAdmin):
