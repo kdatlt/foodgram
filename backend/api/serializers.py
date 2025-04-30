@@ -11,27 +11,24 @@ from recipes.models import (Follow, Ingredient, IngredientRecipe, Recipe, Tag,
 User = get_user_model()
 
 
-class Base64ImageField(serializers.Field):
+class Base64ImageField(serializers.ImageField):
+    """
+    Класс для декодирования изображений в формате base64.
+
+    Принимает строку в формате
+    'data:image/<тип изображения>;base64,<данные изображения в base64>'
+    и преобразует её в объект ContentFile с соответствующим расширением файла.
+    """
+
     def to_internal_value(self, data):
-        # Проверяем, что данные не пустые
-        if not data:
-            return None
+        """Метод преобразования картинки"""
 
-        # Проверяем, что данные являются строкой base64
-        if isinstance(data, str):
-            try:
-                # Декодируем строку base64 в байты
-                decoded_file = base64.b64decode(data)
-            except (TypeError, ValueError, UnicodeDecodeError):
-                raise serializers.ValidationError('Некорректные данные base64')
+        if isinstance(data, str) and data.startswith('data:image'):
+            format, imgstr = data.split(';base64,')
+            ext = format.split('/')[-1]
+            data = ContentFile(base64.b64decode(imgstr), name='photo.' + ext)
 
-            # Создаём объект файла из декодированных данных
-            file_object = ContentFile(decoded_file, name='uploaded_image.jpg')
-
-            return file_object
-        else:
-            raise serializers.ValidationError(
-                'Данные должны быть строкой base64')
+        return super().to_internal_value(data)
 
 
 class TagSerializer(serializers.ModelSerializer):
