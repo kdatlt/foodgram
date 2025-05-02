@@ -40,8 +40,6 @@ class CustomUserViewSet(UserViewSet):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
-"""
     def get_queryset(self):
         if self.action == 'subscriptions':
             queryset = User.objects.filter(
@@ -66,7 +64,7 @@ class CustomUserViewSet(UserViewSet):
         permission_classes=(permissions.IsAuthenticated,)
     )
     def avatar(self, request, **kwargs):
-        Добавление аватара.
+        """Добавление аватара."""
         serializer = self.get_serializer(
             request.user, data=request.data, partial=True
         )
@@ -76,7 +74,7 @@ class CustomUserViewSet(UserViewSet):
 
     @avatar.mapping.delete
     def delete_avatar(self, request, **kwargs):
-        Удаление аватара.
+        """Удаление аватара."""
         request.user.avatar.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -86,7 +84,7 @@ class CustomUserViewSet(UserViewSet):
         permission_classes=(permissions.IsAuthenticated,),
     )
     def subscriptions(self, request):
-        Список подписок текущего пользователя.
+        """Список подписок текущего пользователя."""
         page = self.paginate_queryset(self.get_queryset())
         serializer = self.get_serializer(
             page, many=True, context={'request': request}
@@ -99,7 +97,7 @@ class CustomUserViewSet(UserViewSet):
         permission_classes=(permissions.IsAuthenticated,)
     )
     def subscribe(self, request, **kwargs):
-        Подписка на пользователя.
+        """Подписка на пользователя."""
         serializer = self.get_serializer(
             data=request.data,
             context={'request': request, 'subscribed_to': self.get_object()}
@@ -110,7 +108,7 @@ class CustomUserViewSet(UserViewSet):
 
     @subscribe.mapping.delete
     def delete_subscribe(self, request, **kwargs):
-        Отписка от пользователя.
+        """Отписка от пользователя."""
         try:
             subscription = Subscription.objects.get(
                 user=request.user, subscribed_to=self.get_object()
@@ -119,7 +117,6 @@ class CustomUserViewSet(UserViewSet):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         subscription.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-"""
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
