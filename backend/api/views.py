@@ -5,14 +5,21 @@ from rest_framework import filters, permissions, status, viewsets
 from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.permissions import AllowAny
+from django.db.models import Sum
 
-from recipes.models import Favorite, Ingredient, Recipe, Tag, User
+from recipes.models import (
+    Favorite, Ingredient, Recipe, Tag, User, ShoppingCart, IngredientRecipe)
 
 from .permissions import IsAuthorOrReadOnly
 from .pagination import CustomPagination
 from .serializers import (CustomUserSerializer, FavoritesSerializer,
                           IngredientSerializer, RecipeSerializer,
-                          TagSerializer)
+                          TagSerializer, FavoritesSerializer,
+                          ShoppingCartSerializer, RecipeCreateSerializer)
+
+from .utils import get_short_link
 
 
 class CustomUserViewSet(UserViewSet):
@@ -52,15 +59,6 @@ class CustomUserViewSet(UserViewSet):
             return SubscriptionSerializer
         return super().get_serializer_class()
 
-    @action(
-        detail=False,
-        methods=['get', ],
-        permission_classes=(permissions.IsAuthenticated,)
-    )
-    def me(self, request):
-        Получение информации о текущем пользователе.
-        serializer = self.get_serializer(request.user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(
         detail=True,
@@ -97,7 +95,7 @@ class CustomUserViewSet(UserViewSet):
 
     @action(
         detail=True,
-        methods=['post', ],
+        methods=['post'],
         permission_classes=(permissions.IsAuthenticated,)
     )
     def subscribe(self, request, **kwargs):
@@ -147,10 +145,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeSerializer
     permission_classes = (
         permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly)
-    # filter_backends = (DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend,)
     # filterset_class = RecipeFilter
     pagination_class = CustomPagination
-    """
+
     def perform_create(self, serializer):
         serializer.save(
             author=self.request.user,
@@ -159,76 +157,78 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action == 'favorite':
-            return FavoriteSerializer
+            return FavoritesSerializer
         if self.action == 'shopping_cart':
             return ShoppingCartSerializer
         if self.action in ('list', 'retrieve'):
-            return RecipeReadSerializer
+            return RecipeSerializer
         return RecipeCreateSerializer
 
     @action(
-        detail=True,
-        methods=['get', ],
-        permission_classes=(permissions.AllowAny,),
-        url_path='get-link'
-    )
+        detail=True, methods=['get'],
+        permission_classes=(AllowAny,), url_path='get-link')
     def get_link(self, request, **kwargs):
-        Получение короткой ссылки на рецепт.
-        return Response(
-            {'short-link': request.build_absolute_uri('/')
-             + 's/' + self.get_object().short_link},
-            status=status.HTTP_200_OK
-        )
+        """Получение короткой ссылки на рецепт."""
+        try:
+            recipe = self.get_object()
+            short_link = recipe.short_link
+        except Exception as e:
+            return Response(
+                {'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
 
-    def post_func(self, request, model):
-        Добавление рецепта в Избранное или в Список покупок.
-        serializer = self.get_serializer(
-            data=request.data,
-            context={
-                'request': request,
-                'recipe': self.get_object(),
-                'model': model
-            }
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save(user=request.user, recipe=self.get_object())
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # Формирование полного URL для короткой ссылки
+        base_url = request.build_absolute_uri('/')
+        short_url = f"{base_url}s/{short_link}"
 
-    def delete_func(self, request, model):
-        Удаление рецепта из Избранного или Списка покупок.
+        return Response({'short-link': short_url}, status=status.HTTP_200_OK)
+
+    def add_to_favorites(self, request, model):
+        """Добавление рецепта в 'Избранное' или в 'Список покупок'."""
+        try:
+            recipe = self.get_object()
+            serializer = self.get_serializer(
+                data=request.data,
+                context={'request': request, 'recipe': recipe, 'model': model})
+            serializer.is_valid(raise_exception=True)
+            serializer.save(user=request.user, recipe=recipe)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except Exception:
+            return Response(
+                {'error': 'Произошла ошибка при добавлении рецепта'},
+                status=status.HTTP_400_BAD_REQUEST)
+
+    def delete_from_favorites(self, request, model):
+        """Удаление рецепта из 'Избранного' или 'Списка покупок'."""
         try:
             obj = model.objects.get(
-                user=request.user,
-                recipe=self.get_object()
-            )
-        except ObjectDoesNotExist:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        obj.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+                user=request.user, recipe=self.get_object())
+        except model.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        else:
+            obj.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
         detail=True,
-        methods=['post', ],
+        methods=['post'],
         permission_classes=(permissions.IsAuthenticated,),
     )
     def favorite(self, request, **kwargs):
-        return self.post_func(request=request, model=Favorite)
+        return self.add_to_favorites(request=request, model=Favorite)
 
     @favorite.mapping.delete
     def delete_favorite(self, request, **kwargs):
-        return self.delete_func(request=request, model=Favorite)
+        return self.delete_from_favorites(request=request, model=Favorite)
 
     @action(
-        detail=True,
-        methods=['post', ],
-        permission_classes=(permissions.IsAuthenticated,),
-    )
+        detail=True, methods=['post'],
+        permission_classes=(permissions.IsAuthenticated,))
     def shopping_cart(self, request, **kwargs):
-        return self.post_func(request=request, model=ShoppingCart)
+        return self.add_to_favorites(request=request, model=ShoppingCart)
 
     @shopping_cart.mapping.delete
     def delete_shopping_cart(self, request, **kwargs):
-        return self.delete_func(request=request, model=ShoppingCart)
+        return self.delete_from_favorites(request=request, model=ShoppingCart)
 
     @action(
         detail=False,
@@ -236,7 +236,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=(permissions.IsAuthenticated,),
     )
     def download_shopping_cart(self, request):
-        Скачивание Списка покупок.
+        """Скачивание 'Списка покупок'."""
         indredients = IngredientRecipe.objects.filter(
             recipe__shopping_cart__user=request.user
         ).values(
@@ -247,13 +247,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
             name = ingredient['ingredient__name']
             measurement_unit = ingredient['ingredient__measurement_unit']
             amount = ingredient['amount_sum']
-            shopping_cart += f'{name} ({measurement_unit}) - {amount}\n'
+            shopping_cart += f'{name} - {amount} {measurement_unit}\n'
         return HttpResponse(shopping_cart, content_type='text/plain')
-        """
 
 
 class FavoriteViewSet(viewsets.ModelViewSet):
     """Вьюсет для модели Favorite."""
     queryset = Favorite.objects.all()
     serializer_class = FavoritesSerializer
-    # permission_classes = (permissions.AllowAny,)
+    permission_classes = (permissions.AllowAny,)

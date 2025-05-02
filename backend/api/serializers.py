@@ -6,7 +6,7 @@ from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
 
 from recipes.models import (Follow, Ingredient, IngredientRecipe, Recipe, Tag,
-                            TagRecipe, IngredientRecipe)
+                            TagRecipe, IngredientRecipe, ShoppingCart)
 
 User = get_user_model()
 
@@ -139,6 +139,15 @@ class FavoritesSerializer(serializers.ModelSerializer):
 
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
+
+
+class ShoppingCartSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели ShoppingCart."""
+
+    class Meta:
+        model = ShoppingCart
+        fields = ('user', 'recipe',)
+        read_only_fields = ('user', 'recipe',)
 
 
 class IngredientCreatesRecipeSerializer(serializers.ModelSerializer):
