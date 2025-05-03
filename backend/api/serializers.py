@@ -6,7 +6,7 @@ from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
 
 from recipes.models import (Follow, Ingredient, IngredientRecipe, Recipe, Tag,
-                            TagRecipe, IngredientRecipe, ShoppingCart)
+                            TagRecipe, ShoppingCart, Subscription)
 
 User = get_user_model()
 
@@ -188,3 +188,45 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = ('ingredients', 'tags', 'name',
                   'image', 'text', 'cooking_time')
+
+
+class AvatarSerializer(CustomUserSerializer):
+    """Сериализатор для добавление аватара."""
+
+    class Meta:
+        model = User
+        fields = ('avatar',)
+
+    def validate(self, data):
+        if not data.get('avatar'):
+            raise serializers.ValidationError('Аватар не добавлен.')
+        return data
+
+
+class SubscriptionSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели Subscription."""
+
+    class Meta:
+        model = Subscription
+        fields = ('user', 'subscribed_to',)
+        read_only_fields = ('user', 'subscribed_to',)
+
+    def validate(self, data):
+        user = self.context.get('request').user
+        subscribed_to = self.context.get('subscribed_to')
+
+        # Проверка на подписку на самого себя
+        if user == subscribed_to:
+            raise serializers.ValidationError(
+                'Нельзя подписаться на самого себя!')
+
+        # Проверка на наличие уже существующей подписки
+        if self.is_already_subscribed(user, subscribed_to):
+            raise serializers.ValidationError(
+                f'Вы уже подписаны на {subscribed_to.username}!')
+        return data
+
+    def to_representation(self, instance):
+        serializer = UserWithRecipesSerializer(
+            instance.subscribed_to, context=self.context)
+        return serializer.data

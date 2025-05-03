@@ -6,13 +6,13 @@ from recipes.models import Recipe
 
 def get_short_link(model):
     while True:
-        short_link = str(uuid.uuid4())[:5]
+        short_link = str(uuid.uuid4())[:7]
         if not model.objects.filter(short_link=short_link).exists():
             return short_link
 
 
 def recipe_redirection(request, short_link):
-    # Получение рецепта по короткой ссылке, если не найден - автоматически возвращаем 404
+    # Получение рецепта по короткой ссылке, если не найден - возвращаем 404
     recipe = get_object_or_404(Recipe, short_link=short_link)
     recipe_id = recipe.id
 

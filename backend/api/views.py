@@ -10,14 +10,15 @@ from rest_framework.permissions import AllowAny
 from django.db.models import Sum
 
 from recipes.models import (
-    Favorite, Ingredient, Recipe, Tag, User, ShoppingCart, IngredientRecipe)
+    Favorite, Ingredient, Recipe, Tag, User, ShoppingCart,
+    IngredientRecipe, Subscription)
 
 from .permissions import IsAuthorOrReadOnly
 from .pagination import CustomPagination
 from .serializers import (CustomUserSerializer, FavoritesSerializer,
                           IngredientSerializer, RecipeSerializer,
-                          TagSerializer, FavoritesSerializer,
-                          ShoppingCartSerializer, RecipeCreateSerializer)
+                          TagSerializer, RecipeCreateSerializer,
+                          ShoppingCartSerializer, AvatarSerializer)
 
 from .utils import get_short_link
 
@@ -56,7 +57,6 @@ class CustomUserViewSet(UserViewSet):
         if self.action == 'subscribe':
             return SubscriptionSerializer
         return super().get_serializer_class()
-
 
     @action(
         detail=True,
