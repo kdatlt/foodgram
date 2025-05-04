@@ -54,8 +54,6 @@ class Recipe(models.Model):
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='recipes',
         verbose_name='Автор')
-    short_link = models.CharField(
-        max_length=7, unique=True, blank=True, verbose_name='Короткая ссылка')
     pub_date = models.DateTimeField(
         auto_now_add=True, verbose_name='Дата публикации')
 
@@ -214,3 +212,17 @@ class Subscription(models.Model):
 
     def __str__(self):
         return f'{self.user} подписан на {self.subscribed_to}'
+
+
+class URL(models.Model):
+    """Модель коротких ссылок."""
+    long_url = models.URLField(unique=True, verbose_name='Полная ссылка')
+    token = models.CharField(
+        max_length=6, unique=True, verbose_name='Токен короткой ссылки')
+
+    class Meta:
+        verbose_name = 'ссылка'
+        verbose_name_plural = 'Ссылки'
+
+    def __str__(self):
+        return f'Short URL: {self.token}, Long URL: {self.long_url}'

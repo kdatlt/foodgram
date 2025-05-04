@@ -8,19 +8,42 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import AllowAny
 from django.db.models import Sum
+import uuid
+from rest_framework.decorators import api_view
+from django.http import HttpResponseRedirect, Http404
+from django.urls import reverse
 
 from recipes.models import (
     Favorite, Ingredient, Recipe, Tag, User, ShoppingCart,
-    IngredientRecipe, Subscription)
+    IngredientRecipe, Subscription, URL)
 
 from .permissions import IsAuthorOrReadOnly
 from .pagination import CustomPagination
 from .serializers import (CustomUserSerializer, FavoritesSerializer,
                           IngredientSerializer, RecipeSerializer,
-                          TagSerializer, RecipeCreateSerializer,
+                          TagSerializer, RecipeCreateSerializer, URLSerializer,
                           ShoppingCartSerializer, AvatarSerializer)
 
-from .utils import get_short_link
+
+@api_view(['POST'])
+def generate_short_url(request):
+    '''Создает короткую ссылку'''
+    serializer = URLSerializer(data=request.data)
+    if serializer.is_valid():
+        long_url = serializer.validated_data['long_url']
+        try:
+            url_obj = URL.objects.get(long_url=long_url)
+            response_status = status.HTTP_200_OK
+        except URL.DoesNotExist:
+            token = str(uuid.uuid4())[:6]
+            url_obj = URL(long_url=long_url, token=token)
+            url_obj.save()
+            response_status = status.HTTP_201_CREATED
+
+        short_url = request.build_absolute_uri(f'/short/{url_obj.token}/')
+        return Response({'short_url': short_url}, status=response_status)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CustomUserViewSet(UserViewSet):
@@ -149,8 +172,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(
             author=self.request.user,
-            short_link=get_short_link(Recipe)
-        )
+            short_link=generate_short_url(Recipe))
 
     def get_serializer_class(self):
         if self.action == 'favorite':
@@ -161,21 +183,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeSerializer
         return RecipeCreateSerializer
 
-    @action(
-        detail=True, methods=['get'],
-        permission_classes=(AllowAny,), url_path='get-link')
-    def get_link(self, request, **kwargs):
-        """Получение короткой ссылки на рецепт."""
-        try:
-            recipe = self.get_object()
-            short_link = recipe.short_link
-        except Exception as e:
+    @action(detail=True, methods=['get'], url_path='get-link',)
+    def get(self, request, pk=None):
+        full_url = request.META.get('HTTP_REFERER')
+        if not full_url:
             return Response(
-                {'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
+                {'error': 'Missing HTTP_REFERER'},
+                status=status.HTTP_400_BAD_REQUEST)
 
-        # Формирование полного URL для короткой ссылки
-        base_url = request.build_absolute_uri('/')
-        short_url = f"{base_url}s/{short_link}"
+        link, created = URL.objects.get_or_create(full_url=full_url)
+        short_url = request.build_absolute_uri(
+            reverse('redirect_to_long_url', args=[link.short_url]))
 
         return Response({'short-link': short_url}, status=status.HTTP_200_OK)
 
@@ -253,3 +271,15 @@ class FavoriteViewSet(viewsets.ModelViewSet):
     queryset = Favorite.objects.all()
     serializer_class = FavoritesSerializer
     permission_classes = (permissions.AllowAny,)
+
+
+@api_view(['GET'])
+def redirect_to_long_url(request, token):
+    """Перенаправление с короткой на обычную ссылку"""
+    try:
+        url_obj = URL.objects.get(token=token)
+        response = HttpResponseRedirect(url_obj.long_url)
+        response['Location'] = url_obj.long_url
+        return response
+    except URL.DoesNotExist:
+        raise Http404("Short URL not found")

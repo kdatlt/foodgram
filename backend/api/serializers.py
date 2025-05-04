@@ -6,7 +6,7 @@ from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
 
 from recipes.models import (Follow, Ingredient, IngredientRecipe, Recipe, Tag,
-                            TagRecipe, ShoppingCart, Subscription)
+                            TagRecipe, ShoppingCart, Subscription, URL)
 
 User = get_user_model()
 
@@ -230,3 +230,10 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         serializer = UserWithRecipesSerializer(
             instance.subscribed_to, context=self.context)
         return serializer.data
+
+
+class URLSerializer(serializers.ModelSerializer):
+    """Сериализатор для ссылок."""
+    class Meta:
+        model = URL
+        fields = ['long_url']
