@@ -123,8 +123,6 @@ class Follow(models.Model):
         verbose_name='Подписчик')
 
     class Meta:
-        """Мета-параметры модели"""
-
         verbose_name = 'подписка'
         verbose_name_plural = 'Подписки'
         constraints = [
@@ -134,8 +132,6 @@ class Follow(models.Model):
         ]
 
     def __str__(self):
-        """Метод строкового представления модели."""
-
         return f'{self.user} {self.author}'
 
 
@@ -189,8 +185,6 @@ class ShoppingCart(models.Model):
         ]
 
     def __str__(self):
-        """Метод строкового представления модели."""
-
         return f'{self.user} {self.recipe}'
 
 

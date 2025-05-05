@@ -19,10 +19,11 @@ from recipes.models import (
 
 from .permissions import IsAuthorOrReadOnly
 from .pagination import CustomPagination
-from .serializers import (CustomUserSerializer, FavoritesSerializer,
-                          IngredientSerializer, RecipeSerializer,
-                          TagSerializer, RecipeCreateSerializer, URLSerializer,
-                          ShoppingCartSerializer, AvatarSerializer)
+from .serializers import (
+    CustomUserSerializer, FavoritesSerializer, IngredientSerializer,
+    RecipeSerializer, SubscriptionSerializer, TagSerializer,
+    RecipeCreateSerializer, URLSerializer, ShoppingCartSerializer,
+    AvatarSerializer)
 
 
 @api_view(['POST'])
@@ -54,11 +55,8 @@ class CustomUserViewSet(UserViewSet):
     pagination_class = CustomPagination
 
     @action(
-        detail=False,
-        methods=['get'],
-        permission_classes=(permissions.IsAuthenticated,),
-        url_path='me'
-    )
+        detail=False, methods=['get'],
+        permission_classes=(permissions.IsAuthenticated,), url_path='me')
     def me(self, request):
         """Получение информации о текущем пользователе."""
         serializer = self.get_serializer(request.user)
@@ -75,10 +73,10 @@ class CustomUserViewSet(UserViewSet):
     def get_serializer_class(self):
         if self.action == 'avatar':
             return AvatarSerializer
-        if self.action == 'subscriptions':
-            return UserWithRecipesSerializer
         if self.action == 'subscribe':
             return SubscriptionSerializer
+        if self.action == 'subscriptions':
+            return UserWithRecipesSerializer
         return super().get_serializer_class()
 
     @action(

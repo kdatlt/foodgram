@@ -2,7 +2,7 @@ from django.contrib.admin import ModelAdmin, register
 
 from .models import (
     Ingredient, Tag, IngredientRecipe, TagRecipe, Recipe,
-    Follow, Favorite, ShoppingCart)
+    Follow, Favorite, ShoppingCart, URL)
 
 
 @register(Ingredient)
@@ -18,7 +18,7 @@ class RecipeAdmin(ModelAdmin):
     list_filter = ('author', 'name', 'tags')
     search_fields = ('name',)
 
-    def get_favorites(self, obj: Recipe) -> int:
+    def get_favorites(self, obj: Recipe):
         return obj.favorites.count()
 
     get_favorites.short_description = (
@@ -61,3 +61,8 @@ class FavoriteAdmin(ModelAdmin):
 @register(TagRecipe)
 class TagRecipeAdmin(ModelAdmin):
     list_display = ('pk', 'tag', 'recipe')
+
+
+@register(URL)
+class URLAdmin(ModelAdmin):
+    list_display = ('pk', 'long_url', 'token')
