@@ -1,12 +1,17 @@
-from django.contrib.admin import register
-from django.contrib.auth.admin import UserAdmin
+from django.contrib import admin
+from django.contrib.auth.admin import GroupAdmin, UserAdmin
+from django.contrib.auth.models import Group
 
-from .models import MyUser
+from .models import Subscription, User
 
 
-@register(MyUser)
-class MyUserAdmin(UserAdmin):
-    list_display = ('pk', 'username', 'email', 'first_name', 'last_name',
-                    'password')
-    list_filter = ('username', 'email')
-    search_fields = ('email', 'username')
+@admin.register(User)
+class UserAdmin(UserAdmin):
+    list_display = ('username', 'email', 'first_name', 'last_name')
+    search_fields = ('username', 'email', 'first_name', 'last_name')
+
+
+@admin.register(Subscription)
+class SubscriptionAdmin(admin.ModelAdmin):
+    list_display = ('user', 'subscribed_to')
+    search_fields = ('user__username', 'subscribed_to__username')
