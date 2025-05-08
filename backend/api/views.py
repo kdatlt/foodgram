@@ -130,6 +130,13 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('^name',)
 
+    def get_queryset(self):
+        queryset = Ingredient.objects.all()
+        ingredients = self.request.query_params.get('name')
+        if ingredients is not None:
+            queryset = queryset.filter(name__istartswith=ingredients)
+        return queryset
+
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     """Вьюсет для модели Tag."""
