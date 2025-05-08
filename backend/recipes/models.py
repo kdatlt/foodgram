@@ -34,7 +34,7 @@ class Tag(models.Model):
         max_length=32,
         unique=True,
         blank=False,
-        validators=(RegexValidator(r'^[-a-zA-Z0-9_]+$'),),
+        validators=(RegexValidator(r'^[-a-zA-Z0-9_]+$'),)
     )
 
     class Meta:
@@ -208,9 +208,7 @@ class Favorite(models.Model):
 
     def __str__(self):
         return f'Рецепт: {self.recipe} в избранном у {self.user}'
-    
 
-    
 
 class Subscription(models.Model):
     """Модель подписки."""

@@ -4,7 +4,7 @@ from django.db import models
 from .validators import REGEX_USERNAME, validate_username
 
 
-class  MyUser(AbstractUser):
+class MyUser(AbstractUser):
     """Модель пользователя."""
     username = models.CharField(
         max_length=150,
