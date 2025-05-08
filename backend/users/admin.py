@@ -1,4 +1,4 @@
-from django.contrib.admin import ModelAdmin, register
+from django.contrib.admin import register
 from django.contrib.auth.admin import UserAdmin
 
 from .models import MyUser
