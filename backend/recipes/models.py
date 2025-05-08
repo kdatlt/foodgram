@@ -1,7 +1,8 @@
+from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 
-from users.models import User
+User = get_user_model()
 
 
 class Ingredient(models.Model):
@@ -207,4 +208,31 @@ class Favorite(models.Model):
 
     def __str__(self):
         return f'Рецепт: {self.recipe} в избранном у {self.user}'
+    
 
+    
+
+class Subscription(models.Model):
+    """Модель подписки."""
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='subscribed_to',
+        verbose_name='Пользователь'
+    )
+    subscribed_to = models.ForeignKey(
+        User, on_delete=models.CASCADE, verbose_name='Подписан на'
+    )
+
+    class Meta:
+        verbose_name = 'подписки'
+        verbose_name_plural = 'Подписки'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'subscribed_to'],
+                name='unique_subscription'
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.user} подписан на {self.subscribed_to}'

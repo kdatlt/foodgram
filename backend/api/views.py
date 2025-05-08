@@ -6,12 +6,11 @@ from djoser.views import UserViewSet
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.contrib.auth import get_user_model
 
 from recipes.models import (
     Favorite, Ingredient, IngredientRecipe,
-    Recipe, ShoppingCart, Tag
-)
-from users.models import Subscription, User
+    Recipe, ShoppingCart, Tag, Subscription)
 from .filters import RecipeFilter
 from .pagination import CustomPagination
 from .permissions import IsAuthorOrReadOnly
@@ -20,9 +19,12 @@ from .serializers import (
     FavoriteSerializer, IngredientSerializer,
     RecipeCreateSerializer, RecipeReadSerializer,
     ShoppingCartSerializer, SubscriptionSerializer,
-    TagSerializer, UserWithRecipesSerializer
-)
+    TagSerializer, UserWithRecipesSerializer)
+
 from .utils import get_short_link
+
+
+User = get_user_model()
 
 
 class CustomUserViewSet(UserViewSet):

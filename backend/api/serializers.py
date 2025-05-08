@@ -1,5 +1,6 @@
 import base64
 
+from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import ContentFile
@@ -8,9 +9,10 @@ from rest_framework import serializers
 
 from recipes.models import (
     Favorite, Ingredient, IngredientRecipe,
-    Recipe, ShoppingCart, Tag, TagRecipe
-)
-from users.models import Subscription, User
+    Recipe, ShoppingCart, Tag, TagRecipe, Subscription)
+
+
+User = get_user_model()
 
 
 class Base64ImageField(serializers.ImageField):
