@@ -1,14 +1,14 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from .validators import REGEX_USERNAME, validate_username
+from .validators import USERNAME_VALIDATOR, validate_username
 
 
 class MyUser(AbstractUser):
     """Модель пользователя."""
     username = models.CharField(
         max_length=150, unique=True, blank=False,
-        validators=(REGEX_USERNAME, validate_username))
+        validators=(USERNAME_VALIDATOR, validate_username))
     email = models.EmailField(
         max_length=254, unique=True, blank=False, verbose_name='email')
     first_name = models.CharField(

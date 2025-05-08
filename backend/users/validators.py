@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 
 
-REGEX_USERNAME = RegexValidator(
+USERNAME_VALIDATOR = RegexValidator(
     r'^[\w.@+-]+\Z', 'Имя пользователя содержит недопустимые символы.')
 
 

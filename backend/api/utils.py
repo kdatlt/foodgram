@@ -18,5 +18,4 @@ def recipe_redirection(request, short_link):
     recipe = get_object_or_404(Recipe, short_link=short_link)
     recipe_id = recipe.id
     return redirect(
-        request.build_absolute_uri('/') + f'recipes/{recipe_id}/'
-    )
+        request.build_absolute_uri('/') + f'recipes/{recipe_id}/')
