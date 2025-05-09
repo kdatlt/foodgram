@@ -16,7 +16,8 @@ services:
 
   backend:
     container_name: backend
-    build: ../backend/
+    image: kdatlt/backend
+    command: gunicorn --bind 0.0.0.0:8080 backend.wsgi
     env_file: .env
     volumes:
       - backend_static:/backend_static
@@ -24,17 +25,16 @@ services:
     depends_on:
       - db
 
+
   frontend:
     container_name: frontend
-    build: ../frontend
-    env_file: .env
+    image: kdatlt/frontend
     volumes:
       - ../frontend/:/app/result_build/
 
   nginx:
     container_name: nginx
-    build: ../infra
-    env_file: .env
+    image: kdatlt/nginx
     ports:
       - "8000:80"
     volumes:
