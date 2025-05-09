@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Sum
 from django.http import HttpResponse
@@ -6,23 +7,18 @@ from djoser.views import UserViewSet
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.contrib.auth import get_user_model
 
-from recipes.models import (
-    Favorite, Ingredient, IngredientRecipe,
-    Recipe, ShoppingCart, Tag, Subscription)
+from recipes.models import (Recipe, Ingredient, IngredientRecipe,
+                            ShoppingCart, Subscription, Tag, Favorite)
 from .filters import RecipeFilter
 from .pagination import CustomPagination
 from .permissions import IsAuthorOrReadOnly
-from .serializers import (
-    AvatarSerializer, CustomUserSerializer,
-    FavoriteSerializer, IngredientSerializer,
-    RecipeCreateSerializer, RecipeReadSerializer,
-    ShoppingCartSerializer, SubscriptionSerializer,
-    TagSerializer, UserWithRecipesSerializer)
-
+from .serializers import (AvatarSerializer, CustomUserSerializer,
+                          FavoriteSerializer, IngredientSerializer,
+                          RecipeCreateSerializer, RecipeReadSerializer,
+                          ShoppingCartSerializer, SubscriptionSerializer,
+                          TagSerializer, UserRecipesSerializer)
 from .utils import get_short_link
-
 
 User = get_user_model()
 
@@ -46,7 +42,7 @@ class CustomUserViewSet(UserViewSet):
         if self.action == 'avatar':
             return AvatarSerializer
         if self.action == 'subscriptions':
-            return UserWithRecipesSerializer
+            return UserRecipesSerializer
         if self.action == 'subscribe':
             return SubscriptionSerializer
         return super().get_serializer_class()
@@ -255,4 +251,3 @@ class RecipeViewSet(viewsets.ModelViewSet):
             amount = ingredient['amount_sum']
             shopping_cart += f'{name} ({measurement_unit}) - {amount}\n'
         return HttpResponse(shopping_cart, content_type='text/plain')
-

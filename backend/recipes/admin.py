@@ -1,8 +1,7 @@
 from django.contrib.admin import ModelAdmin, register
 
-from .models import (
-    Favorite, Ingredient, IngredientRecipe,
-    Recipe, ShoppingCart, Tag, TagRecipe, Subscription)
+from .models import (Favorite, Ingredient, IngredientRecipe, Recipe,
+                     ShoppingCart, Subscription, Tag, TagRecipe)
 
 
 @register(Favorite)

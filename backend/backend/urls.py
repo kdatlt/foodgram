@@ -1,8 +1,7 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import include, path
 
 from api.utils import recipe_redirection
-
 
 urlpatterns = [
     path('admin/', admin.site.urls),
