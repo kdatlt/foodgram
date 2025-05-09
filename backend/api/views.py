@@ -24,7 +24,7 @@ User = get_user_model()
 
 
 class CustomUserViewSet(UserViewSet):
-    """Вьюсет для модели User."""
+    """Вьюсет модели User."""
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
