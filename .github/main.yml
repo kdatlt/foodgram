@@ -1,10 +1,7 @@
 name: Main Foodgram workflow
 
-on:
-  push:
-    branches:
-      - main
-
+on: push
+ 
 jobs:
   build_backend_and_push_to_docker_hub:
     name: Push backend Docker image to DockerHub
