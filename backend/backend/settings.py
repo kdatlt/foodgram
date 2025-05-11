@@ -22,6 +22,8 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1|localhost').split('|')
 
 AUTH_USER_MODEL = 'users.MyUser'
 
+CSRF_TRUSTED_ORIGINS = os.getenv('ALLOWED_HOSTS')
+
 
 # Application definition
 
@@ -39,6 +41,7 @@ INSTALLED_APPS = [
     'django_filters',
     'rest_framework.authtoken',
     'djoser',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -60,7 +63,6 @@ REST_FRAMEWORK = {
 
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
     ],
 }
 
