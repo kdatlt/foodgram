@@ -219,4 +219,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             measurement_unit = ingredient['ingredient__measurement_unit']
             amount = ingredient['amount_sum']
             shopping_cart += f'{name} ({measurement_unit}) - {amount}\n'
-        return HttpResponse(shopping_cart, content_type='text/plain')
+        response = HttpResponse(shopping_cart, content_type='text/plain')
+        response[
+            'Content-Disposition'] = 'attachment; filename="shopping_cart.txt"'
+        return response
