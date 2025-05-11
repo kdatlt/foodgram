@@ -1,3 +1,4 @@
+from django.contrib import admin
 from django.contrib.admin import ModelAdmin, register
 
 from .models import (Favorite, Ingredient, IngredientRecipe, Recipe,
@@ -29,17 +30,13 @@ class RecipeAdmin(ModelAdmin):
     list_filter = ('author', 'name', 'tags')
     search_fields = ('name',)
 
+    @admin.display(description='Количество добавлений рецепта в избранное')
     def get_favorites(self, obj: Recipe):
         return obj.favorites.count()
 
-    get_favorites.short_description = (
-        'Количество добавлений рецепта в избранное'
-    )
-
+    @admin.display(description='Тег или список тегов')
     def get_tags(self, obj):
         return '\n'.join(obj.tags.values_list('name', flat=True))
-
-    get_tags.short_description = 'Тег или список тегов'
 
 
 @register(ShoppingCart)
