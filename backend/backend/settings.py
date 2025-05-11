@@ -22,7 +22,7 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1|localhost').split('|')
 
 AUTH_USER_MODEL = 'users.MyUser'
 
-CSRF_TRUSTED_ORIGINS = os.getenv('ALLOWED_HOSTS')
+CSRF_TRUSTED_ORIGINS = ['algoritm.zapto.org']
 
 
 # Application definition
