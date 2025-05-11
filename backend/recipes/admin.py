@@ -25,18 +25,13 @@ class IngredientRecipeAdmin(ModelAdmin):
 
 @register(Recipe)
 class RecipeAdmin(ModelAdmin):
-    list_display = (
-        'pk', 'name', 'author', 'pub_date', 'get_favorites', 'get_tags')
+    list_display = ('name', 'author', 'favorites')
     list_filter = ('author', 'name', 'tags')
     search_fields = ('name',)
 
     @admin.display(description='Количество добавлений рецепта в избранное')
     def get_favorites(self, obj: Recipe):
         return obj.favorites.count()
-
-    @admin.display(description='Тег или список тегов')
-    def get_tags(self, obj):
-        return '\n'.join(obj.tags.values_list('name', flat=True))
 
 
 @register(ShoppingCart)
