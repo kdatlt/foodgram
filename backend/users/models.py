@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser, UnicodeUsernameValidator
 from django.db import models
 
 
-class User(AbstractUser):
+class ProjectUser(AbstractUser):
     """Модель пользователя."""
     username = models.CharField(
         max_length=USERNAME_MAX_LENGTH, unique=True, blank=False,
