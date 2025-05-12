@@ -1,3 +1,4 @@
+from api.constants import INVALID_USERNAME
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 
@@ -6,6 +7,6 @@ USERNAME_VALIDATOR = RegexValidator(
 
 
 def validate_username(value):
-    if value.lower() == 'me':
+    if value.lower() == INVALID_USERNAME:
         raise ValidationError(
-            'Недопустимое имя пользователя - me.',)
+            f'Недопустимое имя пользователя - {INVALID_USERNAME}.')

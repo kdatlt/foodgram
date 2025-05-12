@@ -127,7 +127,7 @@ class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tag
-        fields = ('id', 'name', 'slug')
+        fields = '__all__'
 
 
 class RecipeReadSerializer(StatusFieldsMixin):
@@ -147,6 +147,7 @@ class RecipeReadSerializer(StatusFieldsMixin):
             'id', 'tags', 'author', 'ingredients',
             'is_favorited', 'is_in_shopping_cart',
             'name', 'image', 'text', 'cooking_time')
+        read_only_fields = fields
 
     def get_is_favorited(self, obj):
         return self.checking_fields(model=Favorite, obj=obj)
