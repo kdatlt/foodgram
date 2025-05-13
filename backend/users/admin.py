@@ -5,7 +5,7 @@ from .models import ProjectUser
 
 
 @register(ProjectUser)
-class ProjecUserAdmin(UserAdmin):
+class ProjectUserAdmin(UserAdmin):
     list_display = ('pk', 'username', 'email', 'first_name', 'last_name',
                     'password')
     list_filter = ('username', 'email')

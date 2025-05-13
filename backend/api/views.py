@@ -96,10 +96,12 @@ class CustomUserViewSet(UserViewSet):
     @subscribe.mapping.delete
     def delete_subscribe(self, request, **kwargs):
         """Отписка от пользователя."""
-
-        request.user.subscriptions.get(
-            subscribed_to=self.get_object()).delete()
-
+        try:
+            subscription = Subscription.objects.get(
+                user=request.user, subscribed_to=self.get_object())
+        except ObjectDoesNotExist:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        subscription.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

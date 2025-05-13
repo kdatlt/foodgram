@@ -48,9 +48,9 @@ class Recipe(models.Model):
     text = models.TextField(blank=False, verbose_name='Описание')
     ingredients = models.ManyToManyField(
         Ingredient, through='IngredientRecipe', blank=False,
-        verbose_name='Ингредиенты')
+        verbose_name='Ингредиенты', related_name='recipes')
     tags = models.ManyToManyField(
-        Tag, through='TagRecipe', blank=False, verbose_name='Теги')
+        Tag, blank=False, verbose_name='Теги', related_name='recipes')
     cooking_time = models.PositiveSmallIntegerField(
         blank=False, validators=(MinValueValidator(1),),
         verbose_name='Время приготовления')
@@ -89,24 +89,6 @@ class IngredientRecipe(models.Model):
 
     def __str__(self):
         return f'Ингредиент: {self.ingredient} в рецепте: {self.recipe}'
-
-
-class TagRecipe(models.Model):
-    """Промежуточная модель."""
-    tag = models.ForeignKey(Tag, on_delete=models.CASCADE, verbose_name='Тег')
-    recipe = models.ForeignKey(
-        Recipe, on_delete=models.CASCADE, verbose_name='Рецепт')
-
-    class Meta:
-        verbose_name = 'теги в рецепте'
-        verbose_name_plural = 'Теги в рецептах'
-        constraints = [
-            models.UniqueConstraint(
-                fields=['tag', 'recipe'],
-                name='unique_tagrecipe')]
-
-    def __str__(self):
-        return f'Рецепт: {self.recipe} с тегом: {self.tag}'
 
 
 class ShoppingCart(models.Model):

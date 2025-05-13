@@ -6,7 +6,7 @@ from django.core.files.base import ContentFile
 from django.db import transaction
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from recipes.models import (Favorite, Ingredient, IngredientRecipe, Recipe,
-                            ShoppingCart, Subscription, Tag, TagRecipe)
+                            ShoppingCart, Subscription, Tag)
 from rest_framework import serializers
 
 User = get_user_model()
@@ -32,8 +32,8 @@ class StatusFieldsMixin(serializers.ModelSerializer):
         if not request or not request.user.is_authenticated:
             return False
         if model == Subscription:
-            return Subscription.objects.filter(
-                user=request.user, subscribed_to=obj).exists()
+            return request.user.subscribed_to.filter(
+                subscribed_to=obj).exists()
         return model.objects.filter(user=request.user, recipe=obj).exists()
 
 
@@ -103,8 +103,7 @@ class IngredientForRecipeCreateSerializer(serializers.ModelSerializer):
     def validate_amount(self, value):
         if value < 1:
             raise serializers.ValidationError(
-                'Количество ингредиента должно быть больше 0!'
-            )
+                'Количество ингредиента должно быть больше 0!')
         return value
 
 
@@ -182,10 +181,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return data
 
     def validate_tags(self, value):
-        for tag in value:
-            if value.count(tag) > 1:
-                raise serializers.ValidationError(
-                    'Повтор тега недопустим!')
+        if len(value) != len(set(value)):
+            raise serializers.ValidationError('Повтор тега недопустим!')
         return value
 
     def validate_ingredients(self, value):
@@ -197,23 +194,28 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             except ObjectDoesNotExist:
                 raise serializers.ValidationError(
                     f'Ингредиента с id={id} нет в базе!')
-            if id in ingredients_id:
-                raise serializers.ValidationError(
-                    'Повтор ингредиентов недопустим!')
             ingredients_id.append(id)
+
+        if len(ingredients_id) != len(set(ingredients_id)):
+            raise serializers.ValidationError(
+                'Повтор ингредиентов недопустим!')
         return value
 
     def create_tags(self, tags, recipe):
-        for tag in tags:
-            TagRecipe.objects.create(tag=tag, recipe=recipe)
+        recipe.tags.set(tags)
 
     def create_ingredients(self, ingredients, recipe):
+        ingredient_recipes = []
+
         for ingredient in ingredients:
             current_ingredient = Ingredient.objects.get(pk=ingredient['id'])
-            IngredientRecipe.objects.create(
+            ingredient_recipe = IngredientRecipe(
                 ingredient=current_ingredient,
                 recipe=recipe,
                 amount=ingredient['amount'])
+            ingredient_recipes.append(ingredient_recipe)
+
+        IngredientRecipe.objects.bulk_create(ingredient_recipes)
 
     def get_tags(self, data):
         return data.pop('tags')
@@ -232,7 +234,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def update(self, instance, validated_data):
-        TagRecipe.objects.filter(recipe=instance).delete()
+        instance.tags.clear()
         self.create_tags(self.get_tags(validated_data), instance)
 
         IngredientRecipe.objects.filter(recipe=instance).delete()

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.admin import ModelAdmin, register
 
 from .models import (Favorite, Ingredient, IngredientRecipe, Recipe,
-                     ShoppingCart, Subscription, Tag, TagRecipe)
+                     ShoppingCart, Subscription, Tag)
 
 
 @register(Favorite)
@@ -31,25 +31,19 @@ class IngredientInline(admin.TabularInline):
 @register(Recipe)
 class RecipeAdmin(ModelAdmin):
     list_display = ('name', 'text', 'cooking_time')
-    search_fields = ('name',)
+    search_fields = ('name', 'tags__name')
 
 
 @register(ShoppingCart)
 class ShoppingCartAdmin(ModelAdmin):
     list_display = ('user', 'recipe')
-    search_fields = ('user__username', 'recipe__name',)
+    search_fields = ('user__username', 'recipe__name')
 
 
 @register(Tag)
 class TagAdmin(ModelAdmin):
     list_display = ('name', 'slug')
     search_fields = ('name', 'slug')
-
-
-@register(TagRecipe)
-class TagRecipeAdmin(ModelAdmin):
-    list_display = ('tag', 'recipe')
-    search_fields = ('tag__name', 'recipe__name')
 
 
 @register(Subscription)
