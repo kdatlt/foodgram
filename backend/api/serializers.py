@@ -39,7 +39,7 @@ class StatusFieldsMixin(serializers.ModelSerializer):
 
 
 class UserCreateSerializer(CreateSerializer):
-    """Сериализатор для создания пользователя."""
+    """Сериализатор создания пользователя."""
 
     class Meta:
         model = User
