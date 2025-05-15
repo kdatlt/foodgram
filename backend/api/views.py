@@ -3,7 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Sum
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from djoser.views import UserViewSet
+from djoser.views import UserViewSet as ViewSet
 from recipes.models import (Favorite, Ingredient, IngredientRecipe, Recipe,
                             ShoppingCart, Subscription, Tag)
 from rest_framework import permissions, status, viewsets
@@ -23,7 +23,7 @@ from .utils import get_short_link
 User = get_user_model()
 
 
-class CustomUserViewSet(UserViewSet):
+class UserViewSet(ViewSet):
     """Вьюсет модели User."""
     queryset = User.objects.all()
     serializer_class = UserSerializer
