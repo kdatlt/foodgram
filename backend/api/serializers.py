@@ -4,7 +4,8 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import ContentFile
 from django.db import transaction
-from djoser.serializers import UserCreateSerializer, UserSerializer
+from djoser.serializers import (
+    UserCreateSerializer as CreateSerializer, UserSerializer as Serializer)
 from recipes.models import (Favorite, Ingredient, IngredientRecipe, Recipe,
                             ShoppingCart, Subscription, Tag)
 from rest_framework import serializers
@@ -37,7 +38,7 @@ class StatusFieldsMixin(serializers.ModelSerializer):
         return model.objects.filter(user=request.user, recipe=obj).exists()
 
 
-class CustomUserCreateSerializer(UserCreateSerializer):
+class UserCreateSerializer(CreateSerializer):
     """Сериализатор для создания пользователя."""
 
     class Meta:
@@ -53,7 +54,7 @@ class CustomUserCreateSerializer(UserCreateSerializer):
         return data
 
 
-class CustomUserSerializer(UserSerializer, StatusFieldsMixin):
+class UserSerializer(Serializer, StatusFieldsMixin):
     """Сериализатор для модели пользователя."""
 
     is_subscribed = serializers.SerializerMethodField()
@@ -69,7 +70,7 @@ class CustomUserSerializer(UserSerializer, StatusFieldsMixin):
         return self.checking_fields(model=Subscription, obj=obj)
 
 
-class AvatarSerializer(CustomUserSerializer):
+class AvatarSerializer(UserSerializer):
     """Сериализатор для добавление аватара."""
 
     class Meta:
@@ -133,7 +134,7 @@ class RecipeReadSerializer(StatusFieldsMixin):
     """Сериализатор для модели Recipe при GET-запросах."""
 
     tags = TagSerializer(many=True)
-    author = CustomUserSerializer()
+    author = UserSerializer()
     ingredients = IngredientForRecipeReadSerializer(
         many=True, source='ingredients_in_recipe')
     is_favorited = serializers.SerializerMethodField()
@@ -292,7 +293,7 @@ class ShoppingCartSerializer(UniqueRecipeMixin):
         model = ShoppingCart
 
 
-class UserRecipesSerializer(CustomUserSerializer):
+class UserRecipesSerializer(UserSerializer):
     """Сериализатор для модели User и его рецептов."""
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.IntegerField(source="recipes.count")

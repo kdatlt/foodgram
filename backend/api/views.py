@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from .filters import RecipeFilter, IngredientFilter
 from .pagination import CustomPagination
 from .permissions import IsAuthorOrReadOnly
-from .serializers import (AvatarSerializer, CustomUserSerializer,
+from .serializers import (AvatarSerializer, UserSerializer,
                           FavoriteSerializer, IngredientSerializer,
                           RecipeCreateSerializer, RecipeReadSerializer,
                           ShoppingCartSerializer, SubscriptionSerializer,
@@ -26,7 +26,7 @@ User = get_user_model()
 class CustomUserViewSet(UserViewSet):
     """Вьюсет модели User."""
     queryset = User.objects.all()
-    serializer_class = CustomUserSerializer
+    serializer_class = UserSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     pagination_class = CustomPagination
 
