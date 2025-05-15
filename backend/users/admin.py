@@ -1,11 +1,11 @@
 from django.contrib.admin import register
-from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.admin import UserAdmin as Admin
 
-from .models import ProjectUser
+from .models import User
 
 
-@register(ProjectUser)
-class ProjectUserAdmin(UserAdmin):
+@register(User)
+class UserAdmin(Admin):
     list_display = ('pk', 'username', 'email', 'first_name', 'last_name',
                     'password')
     list_filter = ('username', 'email')

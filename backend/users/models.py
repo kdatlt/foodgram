@@ -6,7 +6,7 @@ from django.db import models
 from .validators import validate_username
 
 
-class ProjectUser(AbstractUser):
+class User(AbstractUser):
     """Модель пользователя."""
     username = models.CharField(
         max_length=USERNAME_MAX_LENGTH, unique=True, blank=False,
