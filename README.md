@@ -106,4 +106,4 @@ python manage.py runserver
 * Ссылка для получения полной технической документации к API
 Для доступа к полной технической документации к API используйте следующую ссылку:
 
-https://localhost/docs
+http://localhost/docs
