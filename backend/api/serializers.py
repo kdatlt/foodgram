@@ -51,6 +51,23 @@ class UserCreateSerializer(CreateSerializer):
             raise serializers.ValidationError(
                 'Имя пользователя не может совпадать '
                 'с адресом электронной почты!')
+
+        try:
+            user = User.objects.get(username=data['username'])
+            if user:
+                raise serializers.ValidationError(
+                    'Имя пользователя уже занято!')
+        except ObjectDoesNotExist:
+            pass
+
+        try:
+            user = User.objects.get(email=data['email'])
+            if user:
+                raise serializers.ValidationError(
+                    'Email уже используется!')
+        except ObjectDoesNotExist:
+            pass
+
         return data
 
 
