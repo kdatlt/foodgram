@@ -26,8 +26,7 @@ class Tag(models.Model):
     name = models.CharField(
         max_length=32, unique=True, blank=False, verbose_name='Название')
     slug = models.SlugField(
-        max_length=32, unique=True, blank=False,
-        validators=(RegexValidator(r'^[-a-zA-Z0-9_]+$'),))
+        max_length=32, unique=True, blank=False)
 
     class Meta:
         verbose_name = 'тег'
