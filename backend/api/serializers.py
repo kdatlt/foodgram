@@ -4,8 +4,8 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import ContentFile
 from django.db import transaction
-from djoser.serializers import (
-    UserCreateSerializer as CreateSerializer, UserSerializer as Serializer)
+from djoser.serializers import UserCreateSerializer as CreateSerializer
+from djoser.serializers import UserSerializer as Serializer
 from recipes.models import (Favorite, Ingredient, IngredientRecipe, Recipe,
                             ShoppingCart, Subscription, Tag)
 from rest_framework import serializers

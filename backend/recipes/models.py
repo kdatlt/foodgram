@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
-from django.core.validators import MinValueValidator, RegexValidator
+from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 from django.db import models
 
 User = get_user_model()
@@ -136,6 +137,11 @@ class Subscription(models.Model):
         verbose_name='Пользователь')
     subscribed_to = models.ForeignKey(
         User, on_delete=models.CASCADE, verbose_name='Подписан на')
+
+    def clean(self):
+        if self.user == self.subscribed_to:
+            raise ValidationError("Нельзя подписаться на самого себя")
+        super().clean()
 
     class Meta:
         verbose_name = 'подписки'
