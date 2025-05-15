@@ -24,3 +24,13 @@ class RecipeFilter(django_filters.FilterSet):
         if value == 1 and self.request.user.is_authenticated:
             return queryset.filter(shopping_cart__user=self.request.user)
         return queryset
+
+
+class IngredientFilter(django_filters.FilterSet):
+    """Фильтрует ингредиенты по полю name."""
+    name = django_filters.CharFilter(
+        field_name='name', lookup_expr='icontains')
+
+    class Meta:
+        model = Ingredient
+        fields = {'name': ['icontains']}

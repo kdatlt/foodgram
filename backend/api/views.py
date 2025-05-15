@@ -6,11 +6,11 @@ from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from recipes.models import (Favorite, Ingredient, IngredientRecipe, Recipe,
                             ShoppingCart, Subscription, Tag)
-from rest_framework import filters, permissions, status, viewsets
+from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from .filters import RecipeFilter
+from .filters import RecipeFilter, IngredientFilter
 from .pagination import CustomPagination
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (AvatarSerializer, CustomUserSerializer,
@@ -110,15 +110,8 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = (permissions.AllowAny,)
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('^name',)
-
-    def get_queryset(self):
-        queryset = Ingredient.objects.all()
-        ingredients = self.request.query_params.get('name')
-        if ingredients is not None:
-            queryset = queryset.filter(name__istartswith=ingredients)
-        return queryset
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = IngredientFilter
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
