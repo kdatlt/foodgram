@@ -30,8 +30,12 @@ class IngredientInline(admin.TabularInline):
 
 @register(Recipe)
 class RecipeAdmin(ModelAdmin):
-    list_display = ('name', 'text', 'cooking_time')
+    list_display = ('name', 'text', 'cooking_time', 'favorites')
     search_fields = ('name', 'tags__name')
+
+    @admin.display(description='Число добавлений в избранное')
+    def favorites(self, obj):
+        return obj.favorite.count()
 
 
 @register(ShoppingCart)
