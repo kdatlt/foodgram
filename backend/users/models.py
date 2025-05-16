@@ -25,5 +25,8 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
+    def get_number_of_recipes(self):
+        return self.recipes.count()
+
     def __str__(self):
         return self.username
