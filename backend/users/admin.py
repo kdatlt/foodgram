@@ -14,5 +14,9 @@ class UserAdmin(admin.ModelAdmin):
     def get_number_of_recipes(self, obj):
         return obj.get_number_of_recipes()
 
+    @display(description='Количество подписчиков')
+    def get_number_of_subscribers(self, obj):
+        return obj.get_number_of_subscribers()
+
 
 admin.site.register(User, UserAdmin)

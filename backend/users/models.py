@@ -28,5 +28,8 @@ class User(AbstractUser):
     def get_number_of_recipes(self):
         return self.recipes.count()
 
+    def get_number_of_subscribers(self):
+        return self.subscribed_to.count()
+
     def __str__(self):
         return self.username
