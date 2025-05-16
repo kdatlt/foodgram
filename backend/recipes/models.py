@@ -1,3 +1,6 @@
+from api.constants import (MEASUREMENT_UNIT_MAX_LENGTH, NAME_MAX_LENGTH,
+                           NAME_RECIPE_MAX_LENGTH, NAME_TAG_MAX_LENGTH,
+                           SHORT_LINK_MAX_LENGTH, SLUG_MAX_LENGTH)
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
@@ -9,9 +12,10 @@ User = get_user_model()
 class Ingredient(models.Model):
     """Модель для ингредиента."""
     name = models.CharField(
-        max_length=128, blank=False, verbose_name='Название')
+        max_length=NAME_MAX_LENGTH, blank=False, verbose_name='Название')
     measurement_unit = models.CharField(
-        max_length=64, blank=False, verbose_name='Единица измерения')
+        max_length=MEASUREMENT_UNIT_MAX_LENGTH, blank=False,
+        verbose_name='Единица измерения')
 
     class Meta:
         verbose_name = 'ингредиент'
@@ -25,9 +29,10 @@ class Ingredient(models.Model):
 class Tag(models.Model):
     """Модель для тега."""
     name = models.CharField(
-        max_length=32, unique=True, blank=False, verbose_name='Название')
+        max_length=NAME_TAG_MAX_LENGTH, unique=True, blank=False,
+        verbose_name='Название')
     slug = models.SlugField(
-        max_length=32, unique=True, blank=False)
+        max_length=SLUG_MAX_LENGTH, unique=True, blank=False)
 
     class Meta:
         verbose_name = 'тег'
@@ -43,7 +48,8 @@ class Recipe(models.Model):
         User, on_delete=models.CASCADE, related_name='recipes',
         verbose_name='Автор рецепта')
     name = models.CharField(
-        max_length=256, blank=False, verbose_name='Название')
+        max_length=NAME_RECIPE_MAX_LENGTH, blank=False,
+        verbose_name='Название')
     image = models.ImageField(
         upload_to='images/recipes/', blank=False, verbose_name='Фото')
     text = models.TextField(blank=False, verbose_name='Описание')
@@ -56,7 +62,8 @@ class Recipe(models.Model):
         blank=False, validators=(MinValueValidator(1),),
         verbose_name='Время приготовления')
     short_link = models.CharField(
-        max_length=5, unique=True, blank=True, verbose_name='Короткая ссылка')
+        max_length=SHORT_LINK_MAX_LENGTH, unique=True, blank=True,
+        verbose_name='Короткая ссылка')
     pub_date = models.DateTimeField(
         auto_now_add=True, verbose_name='Дата публикации')
 
