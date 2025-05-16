@@ -32,6 +32,7 @@ class IngredientInline(admin.StackedInline):
 class RecipeAdmin(ModelAdmin):
     list_display = ('name', 'text', 'cooking_time', 'favorites')
     search_fields = ('name', 'tags__name')
+    inlines = (IngredientInline,)
 
     @admin.display(description='Число добавлений в избранное')
     def favorites(self, obj):
