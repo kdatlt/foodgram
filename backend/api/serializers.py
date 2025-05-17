@@ -129,7 +129,9 @@ class IngredientForRecipeReadSerializer(serializers.ModelSerializer):
     """Сериализатор для представления информации об ингредиентах
        в рецептах при чтении данных."""
 
-    id = serializers.ReadOnlyField(source='ingredient.id')
+    id = serializers.PrimaryKeyRelatedField(
+        queryset=Ingredient.objects.all(),
+        source='ingredient')
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
         source='ingredient.measurement_unit')
@@ -205,18 +207,21 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     def validate_ingredients(self, value):
         ingredients_id = []
-        for ingredient in value:
-            id = ingredient['id']
+
+        for ingredient_data in value:
+            ingredient_id = ingredient_data['id']
             try:
-                Ingredient.objects.get(id=id)
+                Ingredient.objects.get(id=ingredient_id)
             except ObjectDoesNotExist:
                 raise serializers.ValidationError(
-                    f'Ингредиента с id={id} нет в базе!')
-            ingredients_id.append(id)
+                    f'Ингредиента с id={ingredient_id} нет в базе!')
+
+            ingredients_id.append(ingredient_id)
 
         if len(ingredients_id) != len(set(ingredients_id)):
             raise serializers.ValidationError(
                 'Повтор ингредиентов недопустим!')
+
         return value
 
     def create_tags(self, tags, recipe):
