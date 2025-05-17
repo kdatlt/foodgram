@@ -8,7 +8,7 @@ from .models import (Favorite, Ingredient, IngredientRecipe, Recipe,
 @register(Favorite)
 class FavoriteAdmin(ModelAdmin):
     list_display = ('user', 'recipe')
-    search_fields = ('user__username', 'recipe__name',)
+    search_fields = ('user__username', 'recipe__name')
 
 
 @register(Ingredient)
