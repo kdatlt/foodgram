@@ -46,3 +46,24 @@
 
 ```bash
 git clone https://github.com/kdatlt/foodgram.git
+
+После клонирования репозитория перейдите в папку, где находится файл docker-compose.yml.
+Это можно сделать с помощью команды:
+
+```bash
+cd foodgram/infra
+
+## Подсказка для заполнения .env
+
+Перед запуском контейнеров необходимо настроить файл .env.
+Вы можете использовать пример файла example.env для понимания структуры и необходимых переменных:
+
+
+DB_NAME=your_db_name
+DB_USER=your_db_user
+DB_PASSWORD=your_db_password
+DB_HOST=db
+DB_PORT=5432
+
+
+Скопируйте файл example.env в .env и заполните необходимые параметры.
