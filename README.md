@@ -123,30 +123,28 @@ docker-compose up
 git clone https://github.com/kdatlt/foodgram.git
 ```
 
-Смена папки После клонирования репозитория перейдите в папку проекта с помощью команды:
+После клонирования репозитория перейдите в папку проекта с помощью команды:
 ```bash
 cd foodgram/
 ```
-
-Настройка виртуального окружения 
+ 
 Для создания и активации виртуального окружения выполните следующие команды:
 ```bash
 python -m venv venv source venv/bin/activate # Для Unix/macOS venv\Scripts\activate # Для Windows
 
-Подсказка для заполнения .env 
 Создайте файл .env в корне проекта и заполните его необходимыми переменными окружения.
 Пример файла .env:
 ```bash
 SECRET_KEY=your_secret_key
 DATABASE_URL=your_database_url
 ```
-Миграция базы и создание суперпользователя 
+
 Выполните миграцию базы данных и создайте суперпользователя с помощью следующих команд:
 
 ```bash
 python manage.py migrate python manage.py createsuperuser
 ```
-Импорт продуктов из CSV или JSON фикстур 
+
 Для импорта продуктов вы можете использовать CSV или JSON фикстуры.
 Пример команды для импорта из JSON:
 
@@ -159,7 +157,6 @@ python manage.py upload_ingredients ingredients.json
 python manage.py runserver
 ```
 
-Ссылка для получения полной технической документации к API
 Для доступа к полной технической документации к API используйте следующую ссылку:
 
 [http://localhost/docs](http://localhost/docs)
