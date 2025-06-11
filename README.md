@@ -134,6 +134,7 @@ python -m venv venv source venv/bin/activate # Для Unix/macOS venv\Scripts\ac
 
 Создайте файл .env в корне проекта и заполните его необходимыми переменными окружения.
 Пример файла .env:
+
 ```bash
 SECRET_KEY=your_secret_key
 DATABASE_URL=your_database_url
