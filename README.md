@@ -86,10 +86,14 @@ docker-compose up -d
 
 - примените миграции для обновления схемы базы данных;
 - создайте суперпользователя для доступа к административной панели;
-- наполните базу данными ингредиентов
+- наполните базу данными ингредиентов.
 
-Для наполнения базы выполните команду:
+Dыполните команды:
 
 ```bash
-docker-compose exec web python manage.py migrate docker-compose exec web python manage.py createsuperuser docker-compose exec web python manage.py loaddata initial_data
+docker-compose exec web python manage.py migrate
+
+docker-compose exec web python manage.py createsuperuser
+
+docker-compose exec web python manage.py loaddata initial_data
 ```
