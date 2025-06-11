@@ -14,7 +14,7 @@
 
 ## Автор проекта
 
-Коробейников Дмитрий Алексеевич: [https://github.com/?ysclid=map548899f488962396](https://github.com/?ysclid=map548899f488962396).
+Коробейников Дмитрий: [https://github.com/?ysclid=map548899f488962396](https://github.com/?ysclid=map548899f488962396).
 
 ## Применённые технологии
 
