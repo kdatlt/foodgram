@@ -97,3 +97,20 @@ docker-compose exec web python manage.py createsuperuser
 
 docker-compose exec web python manage.py loaddata initial_data
 ```
+
+## Сборка статики
+
+Для сборки статических файлов используйте следующую команду:
+```bash
+docker-compose exec web python manage.py collectstatic
+```
+
+## Запуск сервера 
+
+После выполнения всех предыдущих шагов вы можете запустить сервер с помощью команды:
+
+```bash
+docker-compose up
+```
+
+Теперь ваш проект должен быть доступен по адресу http://localhost:8000.
