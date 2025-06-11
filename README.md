@@ -46,6 +46,7 @@
 
 ```bash
 git clone https://github.com/kdatlt/foodgram.git
+```
 
 После клонирования репозитория перейдите в папку, где находится файл docker-compose.yml.
 Это можно сделать с помощью команды:
