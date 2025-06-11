@@ -1,6 +1,6 @@
 name: Main Foodgram workflow
 
-on: push
+# on: push
  
 jobs:
   build_backend_and_push_to_docker_hub:
